@@ -14,11 +14,13 @@ use Spiral\Telemetry\ClockInterface;
 use Spiral\Telemetry\Config\TelemetryConfig;
 use Spiral\Telemetry\ConfigTracerFactoryProvider;
 use Spiral\Telemetry\Exception\TracerException;
+use Spiral\Telemetry\LogTracer;
 use Spiral\Telemetry\LogTracerFactory;
+use Spiral\Telemetry\NullTracer;
 use Spiral\Telemetry\NullTracerFactory;
 use Spiral\Telemetry\TracerFactoryInterface;
-use Spiral\Telemetry\TracerFactoryProviderInterface;
 use Spiral\Telemetry\TracerInterface;
+use Spiral\Telemetry\TracerFactoryProviderInterface;
 
 final class TelemetryBootloader extends Bootloader
 {
@@ -33,7 +35,7 @@ final class TelemetryBootloader extends Bootloader
     ];
 
     public function __construct(
-        private readonly ConfiguratorInterface $config,
+        private readonly ConfiguratorInterface $config
     ) {
     }
 
@@ -49,7 +51,7 @@ final class TelemetryBootloader extends Bootloader
     {
         $this->config->modify(
             TelemetryConfig::CONFIG,
-            new Append('drivers', $name, $driver),
+            new Append('drivers', $name, $driver)
         );
     }
 
@@ -57,7 +59,7 @@ final class TelemetryBootloader extends Bootloader
      * @throws TracerException
      */
     public function initFactory(
-        TracerFactoryProviderInterface $tracerProvider,
+        TracerFactoryProviderInterface $tracerProvider
     ): TracerFactoryInterface {
         return $tracerProvider->getTracerFactory();
     }
@@ -66,7 +68,7 @@ final class TelemetryBootloader extends Bootloader
      * @throws TracerException
      */
     public function getTracer(
-        TracerFactoryInterface $tracerFactory,
+        TracerFactoryInterface $tracerFactory
     ): TracerInterface {
         return $tracerFactory->make();
     }
@@ -81,7 +83,7 @@ final class TelemetryBootloader extends Bootloader
                     'null' => NullTracerFactory::class,
                     'log' => LogTracerFactory::class,
                 ],
-            ],
+            ]
         );
     }
 }

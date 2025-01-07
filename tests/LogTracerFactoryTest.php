@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Spiral\Tests\Telemetry;
 
-use PHPUnit\Framework\Attributes\RunInSeparateProcess;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Spiral\Core\ScopeInterface;
@@ -15,28 +15,30 @@ use Spiral\Telemetry\LogTracerFactory;
 
 final class LogTracerFactoryTest extends TestCase
 {
+    use m\Adapter\Phpunit\MockeryPHPUnitIntegration;
+
     public function testMake(): void
     {
-        $logs = $this->createMock(LogsInterface::class);
+        $logs = m::mock(LogsInterface::class);
 
-        $logs->expects($this->once())
-            ->method('getLogger')
+        $logs->shouldReceive('getLogger')->once()
             ->with('some-channel')
-            ->willReturn($logger = $this->createMock(LoggerInterface::class));
+            ->andReturn($logger = m::mock(LoggerInterface::class));
 
         $factory = new LogTracerFactory(
-            $scope = $this->createMock(ScopeInterface::class),
-            $clock = $this->createMock(ClockInterface::class),
+            $scope = m::mock(ScopeInterface::class),
+            $clock = m::mock(ClockInterface::class),
             $logs,
             'some-channel'
         );
 
-        $clock->method('now');
-        $logger->expects($this->once())->method('debug');
+        $clock->shouldReceive('now');
+        $scope->shouldReceive('runScope')->once();
+        $logger->shouldReceive('debug')->once();
 
-        self::assertInstanceOf(LogTracer::class, $tracer = $factory->make());
+        $this->assertInstanceOf(LogTracer::class, $tracer = $factory->make());
 
-        $tracer->trace('foo', static fn(): string => 'hello');
+        $tracer->trace('foo', fn() => 'hello');
     }
 }
 
