@@ -32,7 +32,7 @@ final class LogTracerTest extends TestCase
 
         $uuid->shouldReceive('uuid4')->once()->andReturn($uuid = Uuid::uuid4());
 
-        $callable = static fn(): string => 'hello';
+        $callable = fn() => 'hello';
 
         $invoker->shouldReceive('invoke')
             ->once()
@@ -43,13 +43,19 @@ final class LogTracerTest extends TestCase
         $logger->shouldReceive('debug')->once();
 
         $scope->shouldReceive('runScope')
-            ->withArgs(static fn(array $scope): bool =>
+            ->withArgs(fn(array $scope) =>
                 $scope[SpanInterface::class] instanceof Span
                 && $scope[SpanInterface::class]->getName() === 'foo'
             )
             ->andReturnUsing(fn(array $scope, callable $callable) => $callable($invoker));
 
-        self::assertSame('hello', $tracer->trace('foo', $callable, ['foo' => 'bar']));
-        self::assertSame(['telemetry' => $uuid->toString()], $tracer->getContext());
+        $this->assertSame(
+            'hello',
+            $tracer->trace('foo', $callable, ['foo' => 'bar'])
+        );
+        $this->assertSame(
+            ['telemetry' => $uuid->toString()],
+            $tracer->getContext()
+        );
     }
 }
