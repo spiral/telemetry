@@ -10,6 +10,7 @@ use Spiral\Core\ScopeInterface;
 use Spiral\Logger\LogsInterface;
 
 /**
+ * @internal The component is under development.
  * Something may be changed in the future. We will stable it soon.
  * Feedback is welcome {@link https://github.com/spiral/framework/discussions/822}.
  */
@@ -23,7 +24,7 @@ final class LogTracerFactory implements TracerFactoryInterface
         private readonly ScopeInterface $scope,
         private readonly ClockInterface $clock,
         LogsInterface $logs,
-        string $channel = self::LOG_CHANNEL,
+        string $channel = self::LOG_CHANNEL
     ) {
         $this->logger = $logs->getLogger($channel);
     }
@@ -34,7 +35,7 @@ final class LogTracerFactory implements TracerFactoryInterface
             $this->scope,
             $this->clock,
             $this->logger,
-            new UuidFactory(),
+            new UuidFactory()
         );
     }
 }

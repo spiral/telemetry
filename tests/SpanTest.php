@@ -13,22 +13,22 @@ final class SpanTest extends TestCase
     {
         $span = new Span('foo');
 
-        self::assertSame('foo', $span->getName());
+        $this->assertSame('foo', $span->getName());
 
         $span->updateName('bar');
-        self::assertSame('bar', $span->getName());
+        $this->assertSame('bar', $span->getName());
     }
 
     public function testConstructorWithoutAttributes(): void
     {
         $span = new Span('foo');
-        self::assertSame([], $span->getAttributes());
+        $this->assertSame([], $span->getAttributes());
     }
 
     public function testConstructorWithAttributes(): void
     {
         $span = new Span('foo', ['baz' => 'bar']);
-        self::assertSame(['baz' => 'bar'], $span->getAttributes());
+        $this->assertSame(['baz' => 'bar'], $span->getAttributes());
     }
 
     public function testSetsAttributes(): void
@@ -36,36 +36,36 @@ final class SpanTest extends TestCase
         $span = new Span('foo', ['baz' => 'bar']);
         $span->setAttribute('baf', 123);
 
-        self::assertSame(['baz' => 'bar', 'baf' => 123], $span->getAttributes());
+        $this->assertSame(['baz' => 'bar', 'baf' => 123], $span->getAttributes());
 
         $span->setAttributes(['foo' => 'bar']);
-        self::assertSame(['foo' => 'bar'], $span->getAttributes());
+        $this->assertSame(['foo' => 'bar'], $span->getAttributes());
     }
 
     public function testHasAttribute(): void
     {
         $span = new Span('foo', ['baz' => 'bar']);
 
-        self::assertTrue($span->hasAttribute('baz'));
-        self::assertFalse($span->hasAttribute('foo'));
+        $this->assertTrue($span->hasAttribute('baz'));
+        $this->assertFalse($span->hasAttribute('foo'));
     }
 
     public function testGetsAttribute(): void
     {
         $span = new Span('foo', ['baz' => 'bar']);
-        self::assertSame('bar', $span->getAttribute('baz'));
-        self::assertNull($span->getAttribute('baf'));
+        $this->assertSame('bar', $span->getAttribute('baz'));
+        $this->assertNull($span->getAttribute('baf'));
     }
 
     public function testSetsStatus(): void
     {
         $span = new Span('foo');
 
-        self::assertNull($span->getStatus());
+        $this->assertNull($span->getStatus());
 
         $span->setStatus(404, 'Not found');
 
-        self::assertSame(404, $span->getStatus()->code);
-        self::assertSame('Not found', $span->getStatus()->description);
+        $this->assertSame(404, $span->getStatus()->code);
+        $this->assertSame('Not found', $span->getStatus()->description);
     }
 }

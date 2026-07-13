@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Spiral\Telemetry;
 
 use Psr\Log\LoggerInterface;
+use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidFactoryInterface;
 use Spiral\Core\ScopeInterface;
 
@@ -21,7 +22,7 @@ final class LogTracer extends AbstractTracer
         ScopeInterface $scope,
         private readonly ClockInterface $clock,
         private readonly LoggerInterface $logger,
-        private readonly UuidFactoryInterface $uuidFactory,
+        private readonly UuidFactoryInterface $uuidFactory
     ) {
         parent::__construct($scope);
     }
@@ -32,7 +33,7 @@ final class LogTracer extends AbstractTracer
         array $attributes = [],
         bool $scoped = false,
         ?TraceKind $traceKind = null,
-        ?int $startTime = null,
+        ?int $startTime = null
     ): mixed {
         $span = new Span($name, $attributes);
 

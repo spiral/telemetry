@@ -13,6 +13,6 @@ final class SystemClockTest extends TestCase
     {
         $clock = new SystemClock();
 
-        self::assertIsInt($clock->now());
+        $this->assertIsInt($clock->now());
     }
 }
