@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Spiral\Tests\Telemetry;
 
 use Mockery as m;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 use Spiral\Core\InvokerInterface;
 use Spiral\Core\ScopeInterface;
@@ -16,15 +17,16 @@ final class NullTracerTest extends TestCase
 {
     use m\Adapter\Phpunit\MockeryPHPUnitIntegration;
 
-    public function testTrace(): void
+    #[RunInSeparateProcess]
+    public function testFallbackRunScope(): void
     {
         $tracer = new NullTracer(
-            $scope = m::mock(ScopeInterface::class)
+            $scope = m::mock(ScopeInterface::class),
         );
 
         $invoker = m::mock(InvokerInterface::class);
 
-        $callable = fn() => 'hello';
+        $callable = static fn(): string => 'hello';
 
         $invoker->shouldReceive('invoke')
             ->once()
@@ -32,15 +34,13 @@ final class NullTracerTest extends TestCase
             ->andReturn('hello');
 
         $scope->shouldReceive('runScope')
-            ->withArgs(fn(array $scope) =>
+            ->withArgs(
+                static fn(array $scope): bool =>
                 $scope[SpanInterface::class] instanceof Span
-                && $scope[SpanInterface::class]->getName() === 'foo'
+                && $scope[SpanInterface::class]->getName() === 'foo',
             )
-            ->andReturnUsing(fn(array $scope, callable $callable) => $callable($invoker));
+            ->andReturnUsing(static fn(array $scope, callable $callable) => $callable($invoker));
 
-        $this->assertSame(
-            'hello',
-            $tracer->trace('foo', $callable, ['foo' => 'bar'])
-        );
+        self::assertSame('hello', $tracer->trace('foo', $callable, ['foo' => 'bar']));
     }
 }

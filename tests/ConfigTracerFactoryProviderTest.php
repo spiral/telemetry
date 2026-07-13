@@ -20,7 +20,7 @@ final class ConfigTracerFactoryProviderTest extends TestCase
     {
         $provider = new ConfigTracerFactoryProvider(
             new TelemetryConfig(['drivers' => ['foo' => 'bar']]),
-            $factory = \Mockery::mock(FactoryInterface::class)
+            $factory = \Mockery::mock(FactoryInterface::class),
         );
 
         $factory->shouldReceive('make')
@@ -28,7 +28,7 @@ final class ConfigTracerFactoryProviderTest extends TestCase
             ->with('bar')
             ->andReturn($f = \Mockery::mock(TracerFactoryInterface::class));
 
-        $this->assertSame($f, $provider->getTracerFactory('foo'));
+        self::assertSame($f, $provider->getTracerFactory('foo'));
     }
 
     public function testGetsTraceeFactoryWithDefaultName(): void
@@ -36,9 +36,9 @@ final class ConfigTracerFactoryProviderTest extends TestCase
         $provider = new ConfigTracerFactoryProvider(
             new TelemetryConfig([
                 'default' => 'foo',
-                'drivers' => ['foo' => 'bar']
+                'drivers' => ['foo' => 'bar'],
             ]),
-            $factory = \Mockery::mock(FactoryInterface::class)
+            $factory = \Mockery::mock(FactoryInterface::class),
         );
 
         $factory->shouldReceive('make')
@@ -46,7 +46,7 @@ final class ConfigTracerFactoryProviderTest extends TestCase
             ->with('bar')
             ->andReturn($f = \Mockery::mock(TracerFactoryInterface::class));
 
-        $this->assertSame($f, $provider->getTracerFactory());
+        self::assertSame($f, $provider->getTracerFactory());
     }
 
     public function testGetsTraceeFactoryWithNonExistName(): void
@@ -57,9 +57,9 @@ final class ConfigTracerFactoryProviderTest extends TestCase
         $provider = new ConfigTracerFactoryProvider(
             new TelemetryConfig([
                 'default' => 'bar',
-                'drivers' => ['foo' => 'bar']
+                'drivers' => ['foo' => 'bar'],
             ]),
-            $factory = \Mockery::mock(FactoryInterface::class)
+            $factory = \Mockery::mock(FactoryInterface::class),
         );
 
         $provider->getTracerFactory();

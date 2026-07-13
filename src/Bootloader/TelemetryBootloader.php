@@ -4,23 +4,24 @@ declare(strict_types=1);
 
 namespace Spiral\Telemetry\Bootloader;
 
+use Psr\Container\ContainerInterface;
 use Spiral\Boot\Bootloader\Bootloader;
 use Spiral\Boot\EnvironmentInterface;
 use Spiral\Config\ConfiguratorInterface;
 use Spiral\Config\Patch\Append;
+use Spiral\Core\BinderInterface;
+use Spiral\Core\Config\Proxy;
 use Spiral\Core\Container\Autowire;
 use Spiral\Telemetry\Clock\SystemClock;
 use Spiral\Telemetry\ClockInterface;
 use Spiral\Telemetry\Config\TelemetryConfig;
 use Spiral\Telemetry\ConfigTracerFactoryProvider;
 use Spiral\Telemetry\Exception\TracerException;
-use Spiral\Telemetry\LogTracer;
 use Spiral\Telemetry\LogTracerFactory;
-use Spiral\Telemetry\NullTracer;
 use Spiral\Telemetry\NullTracerFactory;
 use Spiral\Telemetry\TracerFactoryInterface;
-use Spiral\Telemetry\TracerInterface;
 use Spiral\Telemetry\TracerFactoryProviderInterface;
+use Spiral\Telemetry\TracerInterface;
 
 final class TelemetryBootloader extends Bootloader
 {
@@ -30,17 +31,19 @@ final class TelemetryBootloader extends Bootloader
         ClockInterface::class => SystemClock::class,
     ];
 
-    protected const BINDINGS = [
-        TracerInterface::class => [self::class, 'getTracer'],
-    ];
-
     public function __construct(
-        private readonly ConfiguratorInterface $config
-    ) {
-    }
+        private readonly ConfiguratorInterface $config,
+    ) {}
 
-    public function init(EnvironmentInterface $env): void
+    public function init(BinderInterface $binder, EnvironmentInterface $env): void
     {
+        $binder->bind(TracerInterface::class, new Proxy(
+            TracerInterface::class,
+            false,
+            static fn(ContainerInterface $container): TracerInterface => $container
+                ->get(TracerFactoryInterface::class)
+                ->make(),
+        ));
         $this->initConfig($env);
     }
 
@@ -51,7 +54,7 @@ final class TelemetryBootloader extends Bootloader
     {
         $this->config->modify(
             TelemetryConfig::CONFIG,
-            new Append('drivers', $name, $driver)
+            new Append('drivers', $name, $driver),
         );
     }
 
@@ -59,18 +62,9 @@ final class TelemetryBootloader extends Bootloader
      * @throws TracerException
      */
     public function initFactory(
-        TracerFactoryProviderInterface $tracerProvider
+        TracerFactoryProviderInterface $tracerProvider,
     ): TracerFactoryInterface {
         return $tracerProvider->getTracerFactory();
-    }
-
-    /**
-     * @throws TracerException
-     */
-    public function getTracer(
-        TracerFactoryInterface $tracerFactory
-    ): TracerInterface {
-        return $tracerFactory->make();
     }
 
     private function initConfig(EnvironmentInterface $env): void
@@ -83,7 +77,7 @@ final class TelemetryBootloader extends Bootloader
                     'null' => NullTracerFactory::class,
                     'log' => LogTracerFactory::class,
                 ],
-            ]
+            ],
         );
     }
 }
