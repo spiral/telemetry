@@ -2,7 +2,6 @@
     "name": "spiral/telemetry",
     "type": "library",
     "description": "Telemetry is a collection of tools to instrument, generate, collect, and export telemetry data (metrics, logs, and traces) to help you analyze your software’s performance and behavior.",
-    "keywords": ["spiral", "telemetry", "tracing", "observability", "opentelemetry"],
     "license": "MIT",
     "funding": [
         {
@@ -34,15 +33,15 @@
         }
     ],
     "require": {
-        "php": ">=8.2",
-        "spiral/boot": "^3.18.1",
-        "spiral/core": "^3.18.1"
+        "php": ">=8.1",
+        "spiral/boot": "^3.18.2",
+        "spiral/core": "^3.18.2"
     },
     "require-dev": {
         "mockery/mockery": "^1.6.12",
         "phpunit/phpunit": "^10.5.41",
         "spiral/testing": "^2.12",
-        "vimeo/psalm": "^7.0.2"
+        "vimeo/psalm": "^6.0"
     },
     "autoload": {
         "psr-4": {
